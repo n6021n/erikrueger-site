@@ -27,7 +27,7 @@ body {
 header {
     background-color: #4a4a4a; /* Darker header */
     color: #fff;
-    padding: 1rem 0;
+    padding: 1rem;
     position: fixed; /* Keep nav visible */
     top: 0;
     left: 0;
@@ -36,7 +36,7 @@ header {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-header .container-nav {
+header .container-navbar {
     max-width: 960px;
     margin: 0 auto;
     padding: 0 1rem;
@@ -45,11 +45,19 @@ header .container-nav {
     align-items: center;
 }
 
+header .container-navbar-toggle {
+    display: none; /* Hide by default */
+}
+
 header .logo a {
     color: #fff;
     text-decoration: none;
     font-size: 1.5rem;
     font-weight: bold;
+}
+
+header nav {
+    display: block;
 }
 
 header nav ul {
@@ -70,9 +78,9 @@ header nav ul li a {
 
 header nav ul li a:hover,
 header nav ul li a.active { /* Style for active page */
-    color: #e0aaff; /* A fun highlight color - CHANGE ME! */
-    /* text-decoration: underline; */
+    color: #e0aaff; 
 }
+
 
 /* --- Main Content Area --- */
 main {
@@ -213,10 +221,23 @@ footer {
 }
 
 /* --- Responsive Design --- */
+
 @media (max-width: 768px) {
-    header .container-nav {
+    header .container-navbar-toggle {
+        display: flex; /* Show toggle button on smaller screens */
+        background-color: #4a4a4a; /* Match header color */
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    header .container-navbar {
         flex-direction: column; /* Stack logo and nav */
         align-items: flex-start;
+    }
+
+    header nav {
+        display: none; /* Hide nav links by default */
     }
 
     header nav ul {
@@ -228,9 +249,9 @@ footer {
     header nav ul li {
         margin-left: 0;
         margin-bottom: 0.5rem; /* Space between stacked links */
-        text-align: center;
+        text-align: left;
         width: 100%;
-        background-color: rgba(0,0,0,0.1); /* Slight background for clarity */
+        /*background-color: rgba(0,0,0,0.1); /* Slight background for clarity */
         padding: 0.5rem 0;
         border-radius: 4px;
     }
@@ -248,4 +269,21 @@ footer {
         margin-bottom: 1rem;
         padding: 1.5rem;
     }
+
+    .navbar-toggle {
+        background-color: transparent; /* Match header color */
+        border: 2px solid #fff;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 24px;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-toggle:hover {
+        background-color: #333;
+        color: #fff;
+    }
+    
 }

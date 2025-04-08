@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<script src="script.js"></script>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,23 +7,8 @@
     <title>My Writing - E.R.I. Krueger</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header>
-        <div class="container-nav">
-            <div class="logo">
-                <a href="index.html">E.R.I. Krueger</a>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About Me</a></li>
-                    <li><a href="writing.html" class="active">Projects</a></li>
-                    <!-- <li><a href="blog.html">Blog</a></li> -->
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<body onload="doHeader('projects');">    
+    <header></header>
 
     <main class="container">
         <h2>Stories and Projects</h2>
