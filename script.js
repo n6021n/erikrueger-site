@@ -20,7 +20,7 @@ function doHeader(ActiveItem) {
             <nav>
                 <ul>
                     <li><a href="index.html" id="index">Home</a></li>
-                    <li><a href="about.html" id="about">About Me</a></li>
+                    <li><a href="about.html" id="about">About</a></li>
                     <li><a href="writing.html" id="projects">Projects</a></li>
                     <li><a href="contact.html" id="contact">Contact</a></li>
                 </ul>
