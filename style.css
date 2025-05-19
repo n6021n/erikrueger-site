@@ -162,6 +162,24 @@ img {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+.proj-head {
+    text-align: center;
+    max-width: 960px;
+    margin: 1rem auto; /* Add space top/bottom, center horizontally */
+    padding: 1rem 1rem; /* Add padding on sides */
+    background-color: #fff; /* White content background */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    border-radius: 8px; /* Slightly rounded corners */
+}
+
+.proj-head img {
+    max-width: 300px; /* Control size of hero image */
+    border-radius: 50%; /* Make profile pic circular */
+    margin: 1rem auto;
+    border: 3px solid #fff; /* Optional border */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
 .project, .blog-post {
     border-bottom: 1px solid #eee; /* Separator */
     padding-bottom: 1.5rem;
