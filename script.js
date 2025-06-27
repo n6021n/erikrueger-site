@@ -26,6 +26,7 @@ function doHeader(ActiveItem) {
                     <li><a href="index.html" id="index">Home</a></li>
                     <li><a href="about.html" id="about">About</a></li>
                     <li><a href="writing.html" id="writing">Writing</a></li>
+                    <li><a href="projects.html" id="projects">Projects</a></li>
                     <li><a href="contact.html" id="contact">Contact</a></li>
                 </ul>
             </nav>

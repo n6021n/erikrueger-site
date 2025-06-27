@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Interval Trainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; touch-action: manipulation; }
+        .control-panel, .quiz-container, .results-container { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .btn-answer.correct { background-color: #22c55e; color: white; transform: scale(1.05); }
+        .btn-answer.incorrect { background-color: #ef4444; color: white; }
+        .split-btn-group { display: flex; border-radius: 0.5rem; overflow: hidden; border: 1px solid #d1d5db; }
+        .dark .split-btn-group { border-color: #4b5563; }
+        .split-btn { flex-grow: 1; padding-top: 0.75rem; padding-bottom: 0.75rem; transition: background-color: 0.2s; }
+        .split-btn:first-child { border-right: 1px solid #d1d5db; }
+        .dark .split-btn:first-child { border-right-color: #4b5563; }
+        .mode-btn-group button.active { background-color: #3b82f6; color: white; }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+    <div class="w-full max-w-3xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white">Interval Ear Trainer</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">Hone your listening skills</p>
+        </header>
+
+        <div id="settings-panel" class="control-panel p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold mb-4 text-center">Settings</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="key-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Root Key</label>
+                    <select id="key-select" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>G#</option><option>A</option><option>A#</option><option>B</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sound-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sound</label>
+                    <select id="sound-type" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <option value="synth">Piano</option><option value="sine">Pure Tone (Sine)</option><option value="brass">Brass Horn</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="num-prompts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Questions</label>
+                    <select id="num-prompts" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                        <option>10</option><option selected>20</option><option>30</option><option>40</option><option>50</option>
+                    </select>
+                </div>
+            </div>
+             <div class="grid grid-cols-1 sm:grid-cols-2 mt-4 gap-4">
+                 <button id="play-chord-btn-settings" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow">Play Key Chord</button>
+                 <button id="start-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow">Start Quiz</button>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <label class="block text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Mode</label>
+                <div id="mode-selector" class="mode-btn-group w-full flex rounded-lg bg-gray-200 dark:bg-gray-700 p-1">
+                    <button data-mode="standard" class="active flex-1 text-sm font-semibold p-2 rounded-md transition">Standard</button>
+                    <button data-mode="beginner1" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Beginner 1</button>
+                    <button data-mode="beginner2" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Beginner 2</button>
+                </div>
+                <p id="mode-description" class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3 min-h-[20px] px-2"></p>
+            </div>
+            <div id="familiarize-section" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold mb-3 text-center">Familiarize Yourself</h3>
+                <div id="familiarize-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="quiz-area" class="quiz-container mt-6 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span id="progress-text" class="text-sm font-medium"></span><span id="score-text" class="ml-4 text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-md"></span>
+                </div>
+                <button id="quit-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-lg shadow text-xs">Quit</button>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-6"><div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full"></div></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <button id="play-chord-btn-quiz" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Play Key Chord</button>
+                <div id="replay-container-standard" class="split-btn-group bg-yellow-500 text-white font-semibold shadow">
+                    <button data-direction="asc" class="split-btn hover:bg-yellow-600">Replay 𝄞 → ♫</button>
+                    <button data-direction="desc" class="split-btn hover:bg-yellow-600">Replay ♫ → 𝄞</button>
+                </div>
+                <button id="replay-btn-beginner" class="hidden w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Replay Interval</button>
+            </div>
+            <div id="answer-buttons" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+            <div id="beginner1-answer-buttons" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+            <div id="beginner2-answer-buttons" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+            <div id="feedback-message" class="mt-4 text-center font-semibold text-lg h-8">&nbsp;</div>
+            <button id="next-question-btn" class="hidden mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow">Next Question</button>
+        </div>
+        
+        <div id="results-area" class="results-container mt-6 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hidden">
+            <h2 class="text-2xl font-bold text-center mb-4">Session Complete!</h2>
+            <p id="final-score" class="text-xl text-center mb-6"></p>
+            <h3 class="text-lg font-semibold mb-3">Areas for Improvement:</h3>
+            <ul id="challenges-list" class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300"></ul>
+            <button id="restart-btn" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow">Practice Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dom = {
+                settingsPanel: document.getElementById('settings-panel'), quizArea: document.getElementById('quiz-area'), resultsArea: document.getElementById('results-area'),
+                keySelect: document.getElementById('key-select'), soundTypeSelect: document.getElementById('sound-type'), numPromptsSelect: document.getElementById('num-prompts'),
+                modeSelector: document.getElementById('mode-selector'), modeDescription: document.getElementById('mode-description'), startBtn: document.getElementById('start-btn'),
+                restartBtn: document.getElementById('restart-btn'), quitBtn: document.getElementById('quit-btn'), playChordBtnSettings: document.getElementById('play-chord-btn-settings'),
+                playChordBtnQuiz: document.getElementById('play-chord-btn-quiz'), replayContainerStandard: document.getElementById('replay-container-standard'),
+                replayBtnBeginner: document.getElementById('replay-btn-beginner'), answerButtons: document.getElementById('answer-buttons'),
+                beginner1AnswerButtons: document.getElementById('beginner1-answer-buttons'), beginner2AnswerButtons: document.getElementById('beginner2-answer-buttons'),
+                familiarizeContainer: document.getElementById('familiarize-container'), progressText: document.getElementById('progress-text'), scoreText: document.getElementById('score-text'),
+                progressBar: document.getElementById('progress-bar'), feedbackMessage: document.getElementById('feedback-message'), finalScore: document.getElementById('final-score'),
+                challengesList: document.getElementById('challenges-list'), nextQuestionBtn: document.getElementById('next-question-btn'),
+            };
+
+            const config = {
+                intervals: {
+                    'm2': { name: 'Minor 2nd', semitones: 1, cat1: 'down', cat2: 'minor'}, 'M2': { name: 'Major 2nd', semitones: 2, cat1: 'down', cat2: 'major'},
+                    'm3': { name: 'Minor 3rd', semitones: 3, cat1: 'down', cat2: 'minor'}, 'M3': { name: 'Major 3rd', semitones: 4, cat1: 'down', cat2: 'major'},
+                    'P4': { name: 'Perfect 4th', semitones: 5, cat1: 'either', cat2: 'perfect'}, 'TT': { name: 'Tritone', semitones: 6, cat1: 'either', cat2: null},
+                    'P5': { name: 'Perfect 5th', semitones: 7, cat1: 'either', cat2: 'perfect'}, 'm6': { name: 'Minor 6th', semitones: 8, cat1: 'up', cat2: 'minor'},
+                    'M6': { name: 'Major 6th', semitones: 9, cat1: 'up', cat2: 'major'}, 'm7': { name: 'Minor 7th', semitones: 10, cat1: 'up', cat2: 'minor'},
+                    'M7': { name: 'Major 7th', semitones: 11, cat1: 'up', cat2: 'major'}, 'P8': { name: 'Octave', semitones: 12, cat1: 'either', cat2: 'perfect'}
+                },
+                notes: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+                beginner1Categories: { 'down': 'Resolves Down (2nd/3rd)', 'up': 'Resolves Up (6th/7th)', 'either': 'Resolves Either (Perfect)' },
+                beginner2Categories: { 'major': 'Major', 'minor': 'Minor', 'perfect': 'Perfect' },
+                modeDescriptions: {
+                    standard: 'Identify specific intervals, ascending and descending.',
+                    beginner1: 'Identify intervals by their resolution tendency (up, down, or perfect).',
+                    beginner2: 'Identify intervals by their quality (major, minor, or perfect).'
+                }
+            };
+            
+            let state = {
+                questions: [], currentQuestion: null, currentQuestionIndex: 0, score: 0, totalQuestions: 0, rootNote: 'C', octave: 4,
+                stats: {}, isAnswering: false, gameMode: 'standard',
+                drillInterval: null
+            };
+            let synth, isPlayingInterval = false;
+
+            const createSynth = async () => {
+                await Tone.start();
+                if (synth) synth.dispose();
+                const soundType = dom.soundTypeSelect.value;
+                if (soundType === 'sine') synth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+                else if (soundType === 'brass') synth = new Tone.MonoSynth({ portamento: 0.01, oscillator: { type: "sawtooth" }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.8 }, filterEnvelope: { attack: 0.005, decay: 0.2, sustain: 0.05, release: 0.8, baseFrequency: 300, octaves: 4 } }).toDestination();
+                else synth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fmtriangle', harmonicity: 0.5, modulationType: 'sine' }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+            };
+
+            const getNoteFromInterval = (root, semitones, octave) => {
+                const rootIndex = config.notes.indexOf(root);
+                const finalNoteIndex = (rootIndex + semitones) % 12;
+                const finalOctave = octave + Math.floor((rootIndex + semitones) / 12);
+                return `${config.notes[finalNoteIndex]}${finalOctave}`;
+            };
+
+            const initializeUI = () => {
+                Object.keys(config.intervals).forEach(key => { const data = config.intervals[key]; const btn = document.createElement('button'); btn.dataset.intervalId = key; btn.textContent = data.name; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.answerButtons.appendChild(btn); const famGroup = document.createElement('div'); famGroup.className = 'text-center'; famGroup.innerHTML = `<p class="text-sm font-medium mb-1">${data.name}</p><div class="split-btn-group bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"><button data-interval-id="${key}" data-direction="asc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">🎼 → ♩</button><button data-interval-id="${key}" data-direction="desc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">♩ ⇳ 🎼</button></div>`; dom.familiarizeContainer.appendChild(famGroup);});
+                Object.keys(config.beginner1Categories).forEach(key => { const btn = document.createElement('button'); btn.dataset.categoryId = key; btn.textContent = config.beginner1Categories[key]; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.beginner1AnswerButtons.appendChild(btn); });
+                Object.keys(config.beginner2Categories).forEach(key => { const btn = document.createElement('button'); btn.dataset.categoryId = key; btn.textContent = config.beginner2Categories[key]; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.beginner2AnswerButtons.appendChild(btn); });
+            };
+
+            const startQuiz = async () => {
+                await createSynth();
+                state.gameMode = dom.modeSelector.querySelector('.active').dataset.mode;
+                state.rootNote = dom.keySelect.value;
+                state.totalQuestions = parseInt(dom.numPromptsSelect.value, 10);
+                state.currentQuestionIndex = 0;
+                state.score = 0;
+                state.drillInterval = null;
+                state.stats = Object.keys(config.intervals).reduce((acc, key) => ({...acc, [key]: { correct: 0, incorrect: 0, total: 0 } }), {});
+                dom.settingsPanel.classList.add('hidden');
+                dom.resultsArea.classList.add('hidden');
+                dom.quizArea.classList.remove('hidden');
+                dom.answerButtons.classList.toggle('hidden', state.gameMode !== 'standard');
+                dom.beginner1AnswerButtons.classList.toggle('hidden', state.gameMode !== 'beginner1');
+                dom.beginner2AnswerButtons.classList.toggle('hidden', state.gameMode !== 'beginner2');
+                const isBeginner = state.gameMode.includes('beginner');
+                dom.replayContainerStandard.classList.toggle('hidden', isBeginner);
+                dom.replayBtnBeginner.classList.toggle('hidden', !isBeginner);
+                nextQuestion();
+            };
+
+            const selectNextQuestion = () => {
+                // 33% chance to select the drill interval if it exists
+                if (state.drillInterval && Math.random() < 0.33) {
+                    return state.drillInterval;
+                }
+
+                // Otherwise, select from the general pool
+                let available = Object.keys(config.intervals).filter(id => id !== state.drillInterval);
+                if (state.gameMode.includes("beginner")) {
+                    available = available.filter(id => id !== 'TT' && id !== 'P8');
+                }
+                
+                const randomId = available[Math.floor(Math.random() * available.length)];
+                return randomId;
+            };
+
+            const nextQuestion = () => {
+                if (state.currentQuestionIndex >= state.totalQuestions) { showResults(); return; }
+                const nextIntervalId = selectNextQuestion();
+                state.currentQuestion = { intervalId: nextIntervalId, direction: Math.random() < 0.5 ? 'asc' : 'desc' };
+                state.isAnswering = false;
+                dom.nextQuestionBtn.classList.add('hidden');
+                resetButtonStyles();
+                updateUI();
+                playCurrentInterval();
+            };
+            
+            const playInterval = async (root, intervalId, octave, direction) => {
+                if (isPlayingInterval) return;
+                isPlayingInterval = true;
+                try {
+                    const rootNote = `${root}${octave}`;
+                    const intervalNote = getNoteFromInterval(root, config.intervals[intervalId].semitones, octave);
+                    const rootNoteOctaveUp = `${root}${octave + 1}`;
+                    const pluckDelay = synth instanceof Tone.PluckSynth ? .2 : .5;
+                    const playDirection = state.gameMode.includes("beginner") ? "desc" : direction;
+                    if ("asc" === playDirection) {
+                        const now = Tone.now();
+                        synth.triggerAttackRelease(rootNote, "8n", now);
+                        synth.triggerAttackRelease(intervalNote, "8n", now + pluckDelay);
+                        await new Promise((resolve => setTimeout(resolve, 1e3 * (pluckDelay + .1))));
+                    } else {
+                        const now1 = Tone.now();
+                        synth.triggerAttackRelease(intervalNote, "8n", now1);
+                        synth.triggerAttackRelease(rootNote, "8n", now1 + pluckDelay);
+                        await new Promise((resolve => setTimeout(resolve, 1e3 * pluckDelay + 1e3)));
+                        const now2 = Tone.now();
+                        synth.triggerAttackRelease(intervalNote, "8n", now2);
+                        synth.triggerAttackRelease(rootNoteOctaveUp, "8n", now2 + pluckDelay);
+                        await new Promise((resolve => setTimeout(resolve, 1e3 * (pluckDelay + .1))));
+                    }
+                } finally { isPlayingInterval = false; }
+            };
+
+            const playCurrentInterval = () => {
+                if (!state.currentQuestion) return;
+                playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, state.currentQuestion.direction);
+            };
+            
+            const handleAnswer = e => {
+                if (state.isAnswering) return;
+                state.isAnswering = true;
+                const { intervalId: correctIntervalId } = state.currentQuestion;
+                const correctCat1 = config.intervals[correctIntervalId].cat1;
+                const correctCat2 = config.intervals[correctIntervalId].cat2;
+                const intervalName = config.intervals[correctIntervalId].name;
+                let isCorrect;
+
+                if (state.gameMode === 'standard') isCorrect = e.target.dataset.intervalId === correctIntervalId;
+                else if (state.gameMode === 'beginner1') isCorrect = e.target.dataset.categoryId === correctCat1;
+                else if (state.gameMode === 'beginner2') isCorrect = e.target.dataset.categoryId === correctCat2;
+                
+                state.stats[correctIntervalId].total++;
+
+                if (isCorrect) {
+                    state.score++;
+                    state.stats[correctIntervalId].correct++;
+                    // If the correct answer was the drill item, remove it from drill
+                    if (state.drillInterval === correctIntervalId) {
+                        state.drillInterval = null;
+                    }
+                    e.target.classList.add('correct');
+                    dom.feedbackMessage.textContent = `Correct! It was a ${intervalName}.`;
+                    dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-green-500';
+                } else {
+                    state.stats[correctIntervalId].incorrect++;
+                    // Set this missed interval as the new (and only) drill item
+                    state.drillInterval = correctIntervalId;
+                    
+                    e.target.classList.add('incorrect');
+                    let correctButton, feedbackText;
+                    if (state.gameMode === 'standard') {
+                        correctButton = dom.answerButtons.querySelector(`[data-interval-id="${correctIntervalId}"]`);
+                        feedbackText = `Incorrect. It was a ${intervalName}.`;
+                    } else if (state.gameMode === 'beginner1') {
+                        correctButton = dom.beginner1AnswerButtons.querySelector(`[data-category-id="${correctCat1}"]`);
+                        feedbackText = `Incorrect. It was: ${config.beginner1Categories[correctCat1]}. The interval was a ${intervalName}.`;
+                    } else { // beginner2
+                        correctButton = dom.beginner2AnswerButtons.querySelector(`[data-category-id="${correctCat2}"]`);
+                        feedbackText = `Incorrect. It was: ${config.beginner2Categories[correctCat2]}. The interval was a ${intervalName}.`;
+                    }
+                    if (correctButton) correctButton.classList.add('correct');
+                    dom.feedbackMessage.textContent = feedbackText;
+                    dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-red-500';
+                }
+                state.currentQuestionIndex++;
+                updateUI();
+                dom.nextQuestionBtn.classList.remove('hidden');
+            };
+
+            const updateUI = () => {
+                const qNum = Math.min(state.currentQuestionIndex, state.totalQuestions);
+                dom.progressText.textContent = `Question ${qNum} / ${state.totalQuestions}`;
+                dom.scoreText.textContent = `Score: ${state.score}`;
+                dom.progressBar.style.width = `${(qNum / state.totalQuestions) * 100}%`;
+            };
+
+            const resetButtonStyles = () => {
+                let buttons;
+                if ("standard" === state.gameMode) buttons = dom.answerButtons.querySelectorAll(".btn-answer");
+                else if ("beginner1" === state.gameMode) buttons = dom.beginner1AnswerButtons.querySelectorAll(".btn-answer");
+                else buttons = dom.beginner2AnswerButtons.querySelectorAll(".btn-answer");
+                buttons.forEach((btn => { btn.classList.remove("correct", "incorrect") }));
+                dom.feedbackMessage.textContent = " ";
+                dom.feedbackMessage.className = "mt-4 text-center font-semibold text-lg h-8";
+            };
+
+            const showResults = () => {
+                dom.quizArea.classList.add("hidden");
+                dom.resultsArea.classList.remove("hidden");
+                const questionsAttempted = state.currentQuestionIndex;
+                const total = questionsAttempted < state.totalQuestions && questionsAttempted > 0 ? questionsAttempted : state.totalQuestions;
+                const percentage = total > 0 ? (state.score / total * 100).toFixed(1) : 0;
+                dom.finalScore.textContent = `Your Score: ${state.score} / ${total} (${percentage}%)`;
+                const challenges = Object.keys(state.stats).filter((key => state.stats[key].incorrect > 0)).sort(((a, b) => state.stats[b].incorrect - state.stats[a].incorrect || state.stats[b].total - state.stats[a].total));
+                dom.challengesList.innerHTML = "";
+                if (challenges.length > 0) {
+                    challenges.forEach((key => {
+                        const { name } = config.intervals[key];
+                        const { incorrect, total: totalAttempts } = state.stats[key];
+                        const li = document.createElement("li");
+                        li.textContent = `${name}: Missed ${incorrect} out of ${totalAttempts} times.`;
+                        dom.challengesList.appendChild(li);
+                    }));
+                } else if (total > 0) {
+                    dom.challengesList.innerHTML = "<li>You got everything right! Great job!</li>";
+                } else {
+                    dom.challengesList.innerHTML = "<li>No questions were answered.</li>";
+                }
+            };
+            
+            const restartQuiz = () => {
+                dom.resultsArea.classList.add('hidden');
+                dom.settingsPanel.classList.remove('hidden');
+            };
+
+            const playChord = async rootKey => {
+                if (isPlayingInterval) return;
+                await createSynth();
+                const root = `${rootKey}${state.octave}`;
+                const third = getNoteFromInterval(root.slice(0, -1), 4, state.octave);
+                const fifth = getNoteFromInterval(root.slice(0, -1), 7, state.octave);
+                const now = Tone.now();
+                if (synth instanceof Tone.PolySynth) synth.triggerAttackRelease([root, third, fifth], "1n", now);
+                else {
+                    synth.triggerAttackRelease(root, "8n", now);
+                    synth.triggerAttackRelease(third, "8n", now + .2);
+                    synth.triggerAttackRelease(fifth, "8n", now + .4);
+                }
+            };
+            
+            const updateModeDescription = () => {
+                const activeMode = dom.modeSelector.querySelector('.active').dataset.mode;
+                dom.modeDescription.textContent = config.modeDescriptions[activeMode];
+            }
+
+            dom.modeSelector.addEventListener('click', e => {
+                if (e.target.tagName === 'BUTTON') {
+                    dom.modeSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateModeDescription();
+                }
+            });
+            
+            dom.nextQuestionBtn.addEventListener('click', nextQuestion);
+            dom.startBtn.addEventListener('click', startQuiz);
+            dom.restartBtn.addEventListener('click', restartQuiz);
+            dom.quitBtn.addEventListener('click', showResults);
+            dom.playChordBtnSettings.addEventListener('click', () => playChord(dom.keySelect.value));
+            dom.playChordBtnQuiz.addEventListener('click', () => { if(state.rootNote) playChord(state.rootNote) });
+            dom.replayContainerStandard.querySelectorAll('button').forEach(btn => btn.addEventListener('click', e => { if (state.isAnswering || !state.currentQuestion) return; playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, e.currentTarget.dataset.direction); }));
+            dom.replayBtnBeginner.addEventListener('click', () => { if (state.isAnswering || !state.currentQuestion) return; playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, 'desc'); });
+            dom.familiarizeContainer.addEventListener('click', async e => { if (e.target.matches('[data-interval-id]')) { await createSynth(); playInterval(dom.keySelect.value, e.target.dataset.intervalId, state.octave, e.target.dataset.direction); } });
+            
+            initializeUI();
+            updateModeDescription();
+        });
+    </script>
+</body>
+</html>
