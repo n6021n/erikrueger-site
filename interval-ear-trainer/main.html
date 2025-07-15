@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Interval Trainer</title>
@@ -63,11 +63,11 @@
                  <button id="start-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 shadow">Start Quiz</button>
             </div>
             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <label class="block text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Mode</label>
+                <h3 class="text-lg font-semibold mb-4 text-center">Game Mode</h3>
                 <div id="mode-selector" class="mode-btn-group w-full flex rounded-lg bg-gray-200 dark:bg-gray-700 p-1">
-                    <button data-mode="all_intervals" class="active flex-1 text-sm font-semibold p-2 rounded-md transition">All Intervals</button>
+                    <button data-mode="quality" class="active flex-1 text-sm font-semibold p-2 rounded-md transition">Quality</button>
                     <button data-mode="resolution" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Resolution</button>
-                    <button data-mode="quality" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Quality</button>
+                    <button data-mode="all_intervals" class="flex-1 text-sm font-semibold p-2 rounded-md transition">All Intervals</button>
                     <button data-mode="tone_up" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Tone Up!</button>
                 </div>
                 <p id="mode-description" class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3 min-h-[20px] px-2"></p>
@@ -114,11 +114,7 @@
             
             <div id="interval-quiz-controls" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <button id="play-chord-btn-quiz" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Play Key Chord</button>
-                <div id="replay-container-standard" class="split-btn-group bg-yellow-500 text-white font-semibold shadow">
-                    <button data-direction="asc" class="split-btn hover:bg-yellow-600">Replay 𝄞 → ♫</button>
-                    <button data-direction="desc" class="split-btn hover:bg-yellow-600">Replay ♫ → 𝄞</button>
-                </div>
-                <button id="replay-btn-beginner" class="hidden w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Replay Interval</button>
+                <button id="replay-btn-quiz-single" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Replay Interval</button>
             </div>
 
             <div id="tone-up-quiz-controls" class="hidden mb-6 text-center">
@@ -144,18 +140,26 @@
             <p id="final-score" class="text-xl text-center mb-6"></p>
             <h3 id="challenges-header" class="text-lg font-semibold mb-3">Areas for Improvement:</h3>
             <ul id="challenges-list" class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300"></ul>
-            <button id="restart-btn" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow">Practice Again</button>
+            <button id="restart-btn" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow">Return to Main</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const dom = {
-                settingsPanel: document.getElementById('settings-panel'), quizArea: document.getElementById('quiz-area'), resultsArea: document.getElementById('results-area'),
-                keySelect: document.getElementById('key-select'), soundTypeSelect: document.getElementById('sound-type'), numPromptsSelect: document.getElementById('num-prompts'),
-                modeSelector: document.getElementById('mode-selector'), modeDescription: document.getElementById('mode-description'), startBtn: document.getElementById('start-btn'),
-                restartBtn: document.getElementById('restart-btn'), quitBtn: document.getElementById('quit-btn'), playChordBtnSettings: document.getElementById('play-chord-btn-settings'),
-                playChordBtnQuiz: document.getElementById('play-chord-btn-quiz'), 
+                settingsPanel: document.getElementById('settings-panel'),
+                quizArea: document.getElementById('quiz-area'),
+                resultsArea: document.getElementById('results-area'),
+                keySelect: document.getElementById('key-select'),
+                soundTypeSelect: document.getElementById('sound-type'),
+                numPromptsSelect: document.getElementById('num-prompts'),
+                modeSelector: document.getElementById('mode-selector'),
+                modeDescription: document.getElementById('mode-description'),
+                startBtn: document.getElementById('start-btn'),
+                restartBtn: document.getElementById('restart-btn'),
+                quitBtn: document.getElementById('quit-btn'),
+                playChordBtnSettings: document.getElementById('play-chord-btn-settings'),
+                playChordBtnQuiz: document.getElementById('play-chord-btn-quiz'),
                 intervalQuizControls: document.getElementById('interval-quiz-controls'),
                 toneUpQuizControls: document.getElementById('tone-up-quiz-controls'),
                 playTargetNoteBtn: document.getElementById('play-target-note-btn'),
@@ -165,8 +169,7 @@
                 targetFreqDebug: document.getElementById('target-freq-debug'),
                 freqToggleLabel: document.getElementById('freq-toggle-label'),
                 freqToggle: document.getElementById('freq-toggle'),
-                replayContainerStandard: document.getElementById('replay-container-standard'),
-                replayBtnBeginner: document.getElementById('replay-btn-beginner'), 
+                replayBtnQuizSingle: document.getElementById('replay-btn-quiz-single'),
                 answerButtons: {
                     standard: document.getElementById('answer-buttons-standard'),
                     resolution: document.getElementById('answer-buttons-resolution'),
@@ -181,37 +184,125 @@
                 familiarizeSliderDebugFreq: document.getElementById('familiarize-slider-debug-freq'),
                 familiarizeTargetFreqDebug: document.getElementById('familiarize-target-freq-debug'),
                 centsToleranceInput: document.getElementById('cents-tolerance-input'),
-                progressText: document.getElementById('progress-text'), scoreText: document.getElementById('score-text'),
-                progressBar: document.getElementById('progress-bar'), feedbackMessage: document.getElementById('feedback-message'), finalScore: document.getElementById('final-score'),
-                challengesHeader: document.getElementById('challenges-header'), challengesList: document.getElementById('challenges-list'), nextQuestionBtn: document.getElementById('next-question-btn'),
+                progressText: document.getElementById('progress-text'),
+                scoreText: document.getElementById('score-text'),
+                progressBar: document.getElementById('progress-bar'),
+                feedbackMessage: document.getElementById('feedback-message'),
+                finalScore: document.getElementById('final-score'),
+                challengesHeader: document.getElementById('challenges-header'),
+                challengesList: document.getElementById('challenges-list'),
+                nextQuestionBtn: document.getElementById('next-question-btn'),
             };
 
             const config = {
                 intervals: {
-                    'm2': { name: 'Minor 2nd', semitones: 1, inScale: true, res: 'resolving', qual: 'minor' }, 'M2': { name: 'Major 2nd', semitones: 2, inScale: true, res: 'resolving', qual: 'major' }, 'm3': { name: 'Minor 3rd', semitones: 3, inScale: true, res: 'stable', qual: 'minor' }, 'M3': { name: 'Major 3rd', semitones: 4, inScale: true, res: 'stable', qual: 'major' }, 'P4': { name: 'Perfect 4th', semitones: 5, inScale: true, res: 'resolving', qual: 'perfect' }, 'TT': { name: 'Tritone', semitones: 6, inScale: false, res: null, qual: null }, 'P5': { name: 'Perfect 5th', semitones: 7, inScale: true, res: 'stable', qual: 'perfect' }, 'm6': { name: 'Minor 6th', semitones: 8, inScale: true, res: 'resolving', qual: 'minor' }, 'M6': { name: 'Major 6th', semitones: 9, inScale: true, res: 'resolving', qual: 'major' }, 'm7': { name: 'Minor 7th', semitones: 10, inScale: true, res: 'resolving', qual: 'minor' }, 'M7': { name: 'Major 7th', semitones: 11, inScale: true, res: 'resolving', qual: 'major' }, 'P8': { name: 'Octave', semitones: 12, inScale: true, res: 'stable', qual: 'perfect' }
+                    'm2': { name: 'Minor 2nd', semitones: 1, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'downward_resolution' },
+                    'M2': { name: 'Major 2nd', semitones: 2, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'downward_resolution' },
+                    'm3': { name: 'Minor 3rd', semitones: 3, inScale: true, res: 'stable', qual: 'minor', resolutionType: 'downward_resolution' },
+                    'M3': { name: 'Major 3rd', semitones: 4, inScale: true, res: 'stable', qual: 'major', resolutionType: 'downward_resolution' },
+                    'P4': { name: 'Perfect 4th', semitones: 5, inScale: true, res: 'resolving', qual: 'perfect', resolutionType: 'downward_resolution' },
+                    'TT': { name: 'Tritone', semitones: 6, inScale: false, res: null, qual: null, resolutionType: null },
+                    'P5': { name: 'Perfect 5th', semitones: 7, inScale: true, res: 'stable', qual: 'perfect', resolutionType: 'upward_resolution' },
+                    'm6': { name: 'Minor 6th', semitones: 8, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'upward_resolution' },
+                    'M6': { name: 'Major 6th', semitones: 9, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'upward_resolution' },
+                    'm7': { name: 'Minor 7th', semitones: 10, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'upward_resolution' },
+                    'M7': { name: 'Major 7th', semitones: 11, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'upward_resolution' },
+                    'P8': { name: 'Octave', semitones: 12, inScale: true, res: 'stable', qual: 'perfect', resolutionType: 'upward_resolution' }
                 },
                 notes: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
                 majorScalePattern: [0, 2, 4, 5, 7, 9, 11],
-                resolutionCategories: { 'stable': 'Stable', 'resolving': 'Resolving' },
+                resolutionCategories: { 'downward_resolution': 'Resolves Downward', 'upward_resolution': 'Resolves Upward' },
                 qualityCategories: { 'major': 'Major', 'minor': 'Minor', 'perfect': 'Perfect' },
                 modeDescriptions: {
                     all_intervals: 'Identify specific major, minor, and perfect intervals.',
-                    resolution: 'Identify if an interval is Stable or Resolving.',
+                    resolution: 'Identify if an interval resolves downward or upward.',
                     quality: 'Identify an interval by its quality (Major, Minor, or Perfect).',
                     tone_up: 'Match the target pitch using the slider.'
                 }
             };
-            
-            let state = { currentQuestion: null, currentQuestionIndex: 0, score: 0, totalQuestions: 0, rootNote: 'C', octave: 4, stats: {}, isAnswering: false, gameMode: 'all_intervals', drillInterval: null, sliderOscillator: null, targetFreq: null, familiarizeTargetFreq: null };
-            let synth, isPlayingInterval = false;
 
-            const createSynth = async () => { if (synth) synth.dispose(); await Tone.start(); const soundType = dom.soundTypeSelect.value; if (soundType === 'sine') synth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(); else if (soundType === 'brass') synth = new Tone.MonoSynth({ portamento: 0.01, oscillator: { type: "sawtooth" }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.8 }, filterEnvelope: { attack: 0.005, decay: 0.2, sustain: 0.05, release: 0.8, baseFrequency: 300, octaves: 4 } }).toDestination(); else synth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fmtriangle', harmonicity: 0.5, modulationType: 'sine' }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();};
-            const getNoteFromInterval = (root, semitones, octave) => `${config.notes[(config.notes.indexOf(root)+semitones)%12]}${octave+Math.floor((config.notes.indexOf(root)+semitones)/12)}`;
+            let state = { currentQuestion: null, currentQuestionIndex: 0, score: 0, totalQuestions: 0, rootNote: 'C', octave: 4, stats: {}, isAnswering: false, gameMode: 'quality', sliderOscillator: null, targetFreq: null, familiarizeTargetFreq: null, unansweredPool: [], incorrectPool: [], lastTargetFreq: null };
+            let synth, isPlayingInterval = false, polySynthVoices = [];
+            let currentVoiceIndex = 0;
+            let audioInitialized = false;
+
+            const createSynth = () => {
+                if (synth) {
+                    if (synth.dispose) synth.dispose();
+                    if (polySynthVoices.length > 0) {
+                        polySynthVoices.forEach(voice => voice.dispose());
+                        polySynthVoices = [];
+                    }
+                }
+                const soundType = dom.soundTypeSelect.value;
+                if (soundType === 'sine') {
+                    synth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+                } else if (soundType === 'brass') {
+                    synth = new Tone.MonoSynth({ portamento: 0.01, oscillator: { type: "sawtooth" }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.8 }, filterEnvelope: { attack: 0.005, decay: 0.2, sustain: 0.05, release: 0.8, baseFrequency: 300, octaves: 4 } }).toDestination();
+                } else {
+                    const numVoices = 4;
+                    for (let i = 0; i < numVoices; i++) {
+                        polySynthVoices.push(new Tone.Synth({ oscillator: { type: 'fmtriangle', harmonicity: 0.5, modulationType: 'sine' }, envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination());
+                    }
+                    synth = {
+                        triggerAttackRelease: (note, duration, time) => {
+                            const voice = polySynthVoices[currentVoiceIndex];
+                            voice.triggerAttackRelease(note, duration, time);
+                            currentVoiceIndex = (currentVoiceIndex + 1) % numVoices;
+                        },
+                        dispose: () => {}
+                    };
+                }
+            };
+
+            const initAudioAndSynth = async () => {
+                if (audioInitialized) {
+                    createSynth();
+                    return;
+                }
+                try {
+                    await Tone.start();
+                    createSynth();
+                    audioInitialized = true;
+                } catch (e) {
+                    console.error("Could not start audio context:", e);
+                }
+            };
+
+            const getNoteFromInterval = (root, semitones, octave) => {
+                return `${config.notes[(config.notes.indexOf(root) + semitones) % 12]}${octave + Math.floor((config.notes.indexOf(root) + semitones) / 12)}`;
+            };
 
             const initializeUI = () => {
-                Object.keys(config.intervals).forEach(key => { const data = config.intervals[key]; const btn = document.createElement('button'); btn.dataset.intervalId = key; btn.textContent = data.name; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.answerButtons.standard.appendChild(btn); });
-                Object.keys(config.resolutionCategories).forEach(key => { const btn = document.createElement('button'); btn.dataset.categoryId = key; btn.textContent = config.resolutionCategories[key]; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.answerButtons.resolution.appendChild(btn); });
-                Object.keys(config.qualityCategories).forEach(key => { const btn = document.createElement('button'); btn.dataset.categoryId = key; btn.textContent = config.qualityCategories[key]; btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg'; btn.addEventListener('click', handleAnswer); dom.answerButtons.quality.appendChild(btn); });
+                Object.keys(config.intervals).forEach(key => {
+                    const data = config.intervals[key];
+                    const btn = document.createElement('button');
+                    btn.dataset.intervalId = key;
+                    btn.textContent = data.name;
+                    btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
+                    btn.addEventListener('click', handleAnswer);
+                    dom.answerButtons.standard.appendChild(btn);
+                });
+                const resolutionBtn1 = document.createElement('button');
+                resolutionBtn1.dataset.categoryId = 'downward_resolution';
+                resolutionBtn1.textContent = 'Resolves Downward';
+                resolutionBtn1.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
+                resolutionBtn1.addEventListener('click', handleAnswer);
+                dom.answerButtons.resolution.appendChild(resolutionBtn1);
+                const resolutionBtn2 = document.createElement('button');
+                resolutionBtn2.dataset.categoryId = 'upward_resolution';
+                resolutionBtn2.textContent = 'Resolves Upward';
+                resolutionBtn2.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
+                resolutionBtn2.addEventListener('click', handleAnswer);
+                dom.answerButtons.resolution.appendChild(resolutionBtn2);
+                Object.keys(config.qualityCategories).forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.dataset.categoryId = key;
+                    btn.textContent = config.qualityCategories[key];
+                    btn.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
+                    btn.addEventListener('click', handleAnswer);
+                    dom.answerButtons.quality.appendChild(btn);
+                });
             };
 
             const updateFamiliarizeView = () => {
@@ -223,78 +314,344 @@
                 dom.familiarizeToneupContainer.classList.toggle('hidden', !isToneUp);
                 if (isToneUp) return;
                 let intervalsToShow = Object.keys(config.intervals);
-                if (mode === 'resolution') { intervalsToShow = intervalsToShow.filter(id => config.intervals[id].inScale && id !== 'TT'); dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Stable</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-200 dark:bg-red-700 mr-1.5"></span>Resolving</div>`; }
-                else if (mode === 'quality') { intervalsToShow = intervalsToShow.filter(id => id !== 'TT'); dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-200 dark:bg-yellow-700 mr-1.5"></span>Major</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-200 dark:bg-blue-700 mr-1.5"></span>Minor</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Perfect</div>`; }
-                intervalsToShow.forEach(key => { const data = config.intervals[key]; let colorClass = 'dark:text-gray-200'; if (mode === 'resolution') { if (data.res === 'stable') colorClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'; else if (data.res === 'resolving') colorClass = 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'; } else if (mode === 'quality') { if (data.qual === 'major') colorClass = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'; else if (data.qual === 'minor') colorClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'; else if (data.qual === 'perfect') colorClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';} const famGroup = document.createElement('div'); famGroup.className = 'text-center'; famGroup.innerHTML = `<p class="text-sm font-medium mb-1 p-1 rounded-md ${colorClass}">${data.name}</p><div class="split-btn-group bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"><button data-interval-id="${key}" data-direction="asc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">𝄞 → ♫</button><button data-interval-id="${key}" data-direction="desc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">♫ → 𝄞</button></div>`; dom.familiarizeIntervalContainer.appendChild(famGroup); });
+                if (mode === 'resolution') {
+                    intervalsToShow = intervalsToShow.filter(id => config.intervals[id].resolutionType);
+                    dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Resolves Downward</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-200 dark:bg-red-700 mr-1.5"></span>Resolves Upward</div>`;
+                } else if (mode === 'quality') {
+                    intervalsToShow = intervalsToShow.filter(id => id !== 'TT');
+                    dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-200 dark:bg-yellow-700 mr-1.5"></span>Major</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-200 dark:bg-blue-700 mr-1.5"></span>Minor</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Perfect</div>`;
+                }
+                intervalsToShow.forEach(key => {
+                    const data = config.intervals[key];
+                    let colorClass = 'dark:text-gray-200';
+                    if (mode === 'resolution') {
+                        if (data.resolutionType === 'downward_resolution') colorClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                        else if (data.resolutionType === 'upward_resolution') colorClass = 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+                    } else if (mode === 'quality') {
+                        if (data.qual === 'major') colorClass = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+                        else if (data.qual === 'minor') colorClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+                        else if (data.qual === 'perfect') colorClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+                    }
+                    const famGroup = document.createElement('div');
+                    famGroup.className = 'text-center';
+                    if (mode === 'all_intervals' || mode === 'quality') {
+                        famGroup.innerHTML = `<p class="text-sm font-medium mb-1 p-1 rounded-md ${colorClass}">${data.name}</p><div class="split-btn-group bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"><button data-interval-id="${key}" data-direction="asc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">𝄞 → ♫</button><button data-interval-id="${key}" data-direction="desc" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">♫ → 𝄞</button></div>`;
+                    } else if (mode === 'resolution') {
+                        famGroup.innerHTML = `<p class="text-sm font-medium mb-1 p-1 rounded-md ${colorClass}">${data.name}</p><div class="split-btn-group bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"><button data-interval-id="${key}" data-direction="both" class="split-btn hover:bg-gray-300 dark:hover:bg-gray-600">Play</button></div>`;
+                    }
+                    dom.familiarizeIntervalContainer.appendChild(famGroup);
+                });
             };
 
-            const startQuiz = async () => {
-                await createSynth(); state.gameMode = dom.modeSelector.querySelector('.active').dataset.mode; state.rootNote = dom.keySelect.value; state.totalQuestions = parseInt(dom.numPromptsSelect.value, 10); state.currentQuestionIndex = 0; state.score = 0; state.drillInterval = null; state.stats = Object.keys(config.intervals).reduce(((acc, key) => ({...acc, [key]: { correct: 0, incorrect: 0, total: 0 } })), {});
-                dom.settingsPanel.classList.add('hidden'); dom.resultsArea.classList.add('hidden'); dom.quizArea.classList.remove('hidden');
+            const startQuiz = () => {
+                state.gameMode = dom.modeSelector.querySelector('.active').dataset.mode;
+                state.rootNote = dom.keySelect.value;
+                state.totalQuestions = parseInt(dom.numPromptsSelect.value, 10);
+                state.currentQuestionIndex = 0;
+                state.score = 0;
+                state.stats = Object.keys(config.intervals).reduce(((acc, key) => ({ ...acc, [key]: { correct: 0, incorrect: 0, total: 0 } })), {});
+
+                let available = Object.keys(config.intervals);
+                if (state.gameMode === "resolution") {
+                    available = available.filter(id => config.intervals[id].resolutionType);
+                } else if (state.gameMode === "quality") {
+                    available = available.filter(id => id !== 'TT');
+                } else if (state.gameMode === 'tone_up') {
+                    available = [];
+                }
+                state.unansweredPool = [...available];
+                state.incorrectPool = [];
+                state.lastTargetFreq = null;
+
+                dom.settingsPanel.classList.add('hidden');
+                dom.resultsArea.classList.add('hidden');
+                dom.quizArea.classList.remove('hidden');
                 const isToneUp = state.gameMode === 'tone_up';
-                dom.intervalQuizControls.classList.toggle('hidden', isToneUp); dom.toneUpQuizControls.classList.toggle('hidden', !isToneUp);
-                dom.answerButtons.standard.classList.toggle('hidden', state.gameMode !== 'all_intervals'); dom.answerButtons.resolution.classList.toggle('hidden', state.gameMode !== 'resolution'); dom.answerButtons.quality.classList.toggle('hidden', state.gameMode !== 'quality');
-                const isIntervalBeginner = state.gameMode === 'resolution' || state.gameMode === 'quality';
-                dom.replayContainerStandard.classList.toggle('hidden', isIntervalBeginner || isToneUp); dom.replayBtnBeginner.classList.toggle('hidden', !isIntervalBeginner);
+                dom.intervalQuizControls.classList.toggle('hidden', isToneUp);
+                dom.toneUpQuizControls.classList.toggle('hidden', !isToneUp);
+                dom.replayBtnQuizSingle.classList.toggle('hidden', isToneUp);
+                dom.answerButtons.standard.classList.toggle('hidden', state.gameMode !== 'all_intervals');
+                dom.answerButtons.resolution.classList.toggle('hidden', state.gameMode !== 'resolution');
+                dom.answerButtons.quality.classList.toggle('hidden', state.gameMode !== 'quality');
                 dom.freqToggleLabel.classList.toggle('hidden', !isToneUp);
                 nextQuestion();
             };
 
             const selectNextQuestion = () => {
-                if (state.drillInterval && Math.random() < 0.33) return state.drillInterval;
-                let available = Object.keys(config.intervals).filter((id => id !== state.drillInterval));
-                if (state.gameMode === "resolution") available = available.filter((id => config.intervals[id].inScale && "TT" !== id));
-                else if (state.gameMode === "quality") available = available.filter((id => "TT" !== id));
-                return available[Math.floor(Math.random() * available.length)];
+                if (state.unansweredPool.length === 0) {
+                    let allAvailableIntervals = Object.keys(config.intervals);
+                    if (state.gameMode === "resolution") {
+                        allAvailableIntervals = allAvailableIntervals.filter(id => config.intervals[id].resolutionType);
+                    } else if (state.gameMode === "quality" || state.gameMode === "all_intervals") {
+                        allAvailableIntervals = allAvailableIntervals.filter(id => id !== 'TT');
+                    }
+                    state.unansweredPool = allAvailableIntervals.filter(id => !state.incorrectPool.includes(id));
+                }
+
+                const incorrectPoolHasItems = state.incorrectPool.length > 0;
+                const unansweredPoolHasItems = state.unansweredPool.length > 0;
+
+                if (!incorrectPoolHasItems && !unansweredPoolHasItems) {
+                    return null;
+                }
+
+                let drawFromIncorrect = false;
+                const randomChance = Math.random();
+
+                if (incorrectPoolHasItems) {
+                    if (state.incorrectPool.length === 1 && randomChance < 0.35) {
+                        drawFromIncorrect = true;
+                    } else if (state.incorrectPool.length > 1 && randomChance < 0.65) {
+                        drawFromIncorrect = true;
+                    }
+                }
+
+                let nextIntervalId;
+                if (drawFromIncorrect) {
+                    const randomIndex = Math.floor(Math.random() * state.incorrectPool.length);
+                    nextIntervalId = state.incorrectPool[randomIndex];
+                } else if (unansweredPoolHasItems) {
+                    const randomIndex = Math.floor(Math.random() * state.unansweredPool.length);
+                    nextIntervalId = state.unansweredPool[randomIndex];
+                } else {
+                    const randomIndex = Math.floor(Math.random() * state.incorrectPool.length);
+                    nextIntervalId = state.incorrectPool[randomIndex];
+                }
+
+                return nextIntervalId;
             };
 
-            const nextQuestion = () => {
-                if (state.currentQuestionIndex >= state.totalQuestions) { showResults(); return; }
-                state.isAnswering = false; dom.nextQuestionBtn.classList.add('hidden'); resetButtonStyles();
+            const nextQuestion = async () => {
+                if (state.currentQuestionIndex >= state.totalQuestions) {
+                    showResults();
+                    return;
+                }
+                state.currentQuestionIndex++;
+                state.isAnswering = false;
+                dom.nextQuestionBtn.classList.add('hidden');
+                resetButtonStyles();
+
                 if (state.gameMode === 'tone_up') {
-                    const rootIndex = config.notes.indexOf(state.rootNote);
-                    const scaleNoteIndex = config.majorScalePattern[Math.floor(Math.random() * config.majorScalePattern.length)];
-                    const finalNoteIndex = (rootIndex + scaleNoteIndex) % 12;
-                    const targetNoteName = `${config.notes[finalNoteIndex]}${state.octave}`;
-                    state.targetFreq = Tone.Frequency(targetNoteName).toFrequency();
+                    let newTargetFreq;
+                    do {
+                        const rootIndex = config.notes.indexOf(state.rootNote);
+                        const scaleNoteIndex = config.majorScalePattern[Math.floor(Math.random() * config.majorScalePattern.length)];
+                        const finalNoteIndex = (rootIndex + scaleNoteIndex) % 12;
+                        const targetNoteName = `${config.notes[finalNoteIndex]}${state.octave}`;
+                        newTargetFreq = Tone.Frequency(targetNoteName).toFrequency();
+                    } while (newTargetFreq === state.lastTargetFreq);
+                    
+                    state.targetFreq = newTargetFreq;
+                    state.lastTargetFreq = newTargetFreq;
                     dom.targetFreqDebug.textContent = `Target: ${state.targetFreq.toFixed(2)} Hz`;
-                } else { const nextIntervalId = selectNextQuestion(); state.currentQuestion = { intervalId: nextIntervalId, direction: Math.random() < 0.5 ? 'asc' : 'desc' }; }
+
+                } else {
+                    const nextIntervalId = selectNextQuestion();
+                    if (nextIntervalId === null) {
+                        showResults();
+                        return;
+                    }
+                    if (state.gameMode === 'all_intervals') {
+                        state.currentQuestion = { intervalId: nextIntervalId, direction: Math.random() < 0.5 ? 'tonic-interval' : 'interval-tonic' };
+                    } else if (state.gameMode === 'resolution') {
+                        state.currentQuestion = { intervalId: nextIntervalId, direction: 'solo_interval' };
+                    } else if (state.gameMode === 'quality') {
+                        state.currentQuestion = { intervalId: nextIntervalId, direction: Math.random() < 0.5 ? 'asc' : 'desc' };
+                    }
+                }
                 updateUI();
+
+                if (state.gameMode === 'resolution' && state.currentQuestionIndex === 1) {
+                    await playChord(state.rootNote);
+                    await new Promise(r => setTimeout(r, 750));
+                }
                 playCurrentPrompt();
             };
-            
-            const playInterval = async (root, intervalId, octave, direction) => { if (isPlayingInterval) return; isPlayingInterval = true; try { const rootNote = `${root}${octave}`, intervalNote = getNoteFromInterval(root, config.intervals[intervalId].semitones, octave), rootNoteOctaveUp = `${root}${octave + 1}`; const pluckDelay = synth instanceof Tone.PluckSynth ? .2 : .5; const playDirection = state.gameMode !== 'all_intervals' ? "desc" : direction; if ("asc" === playDirection) { const now = Tone.now(); synth.triggerAttackRelease(rootNote, "8n", now); synth.triggerAttackRelease(intervalNote, "8n", now + pluckDelay); await new Promise((r => setTimeout(r, 1e3 * (pluckDelay + .1)))); } else { const now1 = Tone.now(); synth.triggerAttackRelease(intervalNote, "8n", now1); synth.triggerAttackRelease(rootNote, "8n", now1 + pluckDelay); await new Promise((r => setTimeout(r, 1e3 * pluckDelay + 1e3))); const now2 = Tone.now(); synth.triggerAttackRelease(intervalNote, "8n", now2); synth.triggerAttackRelease(rootNoteOctaveUp, "8n", now2 + pluckDelay); await new Promise((r => setTimeout(r, 1e3 * (pluckDelay + .1)))); } } finally { isPlayingInterval = false; } };
-            const playCurrentPrompt = () => { if(state.gameMode === 'tone_up') { if(state.targetFreq) synth.triggerAttackRelease(state.targetFreq, "1n", Tone.now()); } else { if (!state.currentQuestion) return; playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, state.currentQuestion.direction); }};
-            const handleAnswer = e => { if (state.isAnswering) return; state.isAnswering = true; const { intervalId: correctIntervalId } = state.currentQuestion, correctRes = config.intervals[correctIntervalId].res, correctQual = config.intervals[correctIntervalId].qual, intervalName = config.intervals[correctIntervalId].name; let isCorrect; if (state.gameMode === 'all_intervals') isCorrect = e.target.dataset.intervalId === correctIntervalId; else if (state.gameMode === 'resolution') isCorrect = e.target.dataset.categoryId === correctRes; else if (state.gameMode === 'quality') isCorrect = e.target.dataset.categoryId === correctQual; state.stats[correctIntervalId].total++; if (isCorrect) { state.score++; state.stats[correctIntervalId].correct++; if (state.drillInterval === correctIntervalId) state.drillInterval = null; e.target.classList.add('correct'); dom.feedbackMessage.textContent = `Correct! It was a ${intervalName}.`; dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-green-500'; } else { state.stats[correctIntervalId].incorrect++; state.drillInterval = correctIntervalId; e.target.classList.add('incorrect'); let correctButton, feedbackText; if (state.gameMode === 'all_intervals') { correctButton = dom.answerButtons.standard.querySelector(`[data-interval-id="${correctIntervalId}"]`); feedbackText = `Incorrect. It was a ${intervalName}.`; } else if (state.gameMode === 'resolution') { correctButton = dom.answerButtons.resolution.querySelector(`[data-category-id="${correctRes}"]`); feedbackText = `Incorrect. It was: ${config.resolutionCategories[correctRes]}. The interval was a ${intervalName}.`; } else { correctButton = dom.answerButtons.quality.querySelector(`[data-category-id="${correctQual}"]`); feedbackText = `Incorrect. It was: ${config.qualityCategories[correctQual]}. The interval was a ${intervalName}.`; } if (correctButton) correctButton.classList.add('correct'); dom.feedbackMessage.textContent = feedbackText; dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-red-500'; } updateUI(); dom.nextQuestionBtn.classList.remove('hidden'); };
-            const updateUI = () => { const qNum = state.currentQuestionIndex + 1; dom.progressText.textContent = `Question ${qNum} / ${state.totalQuestions}`; dom.scoreText.textContent = `Score: ${state.score}`; dom.progressBar.style.width = `${(qNum / state.totalQuestions) * 100}%`; };
-            const resetButtonStyles = () => { let e; "all_intervals" === state.gameMode ? e = dom.answerButtons.standard.querySelectorAll(".btn-answer") : "resolution" === state.gameMode ? e = dom.answerButtons.resolution.querySelectorAll(".btn-answer") : "quality" === state.gameMode && (e = dom.answerButtons.quality.querySelectorAll(".btn-answer")); e && e.forEach((e => { e.classList.remove("correct", "incorrect") })), dom.feedbackMessage.textContent = " ", dom.feedbackMessage.className = "mt-4 text-center font-semibold text-lg h-8" };
+
+            const playInterval = async (root, intervalId, octave, direction, mode) => {
+                if (isPlayingInterval) return;
+                if (!synth) return;
+                isPlayingInterval = true;
+                try {
+                    const rootNote = `${root}${octave}`;
+                    const intervalNote = getNoteFromInterval(root, config.intervals[intervalId].semitones, octave);
+                    const rootNoteOctaveUp = `${root}${octave + 1}`;
+                    const noteDuration = "8n";
+                    const noteDurationSeconds = Tone.Time(noteDuration).toSeconds();
+                    const gapBetweenNotesInPair = 0.25;
+                    const delayBetweenPairs = 0.5;
+
+                    if (mode === 'all_intervals' || mode === 'quality') {
+                        if (direction === 'asc' || direction === 'tonic-interval') {
+                            let now = Tone.now();
+                            synth.triggerAttackRelease(rootNote, noteDuration, now);
+                            synth.triggerAttackRelease(intervalNote, noteDuration, now + noteDurationSeconds + gapBetweenNotesInPair);
+                        } else if (direction === 'desc' || direction === 'interval-tonic') {
+                            let now = Tone.now();
+                            synth.triggerAttackRelease(intervalNote, noteDuration, now);
+                            synth.triggerAttackRelease(rootNote, noteDuration, now + noteDurationSeconds + gapBetweenNotesInPair);
+                        }
+                    } else if (mode === 'resolution') {
+                        if (direction === 'solo_interval') {
+                            synth.triggerAttackRelease(intervalNote, noteDuration, Tone.now());
+                        } else if (direction === 'both') {
+                            let now = Tone.now();
+                            synth.triggerAttackRelease(intervalNote, noteDuration, now);
+                            synth.triggerAttackRelease(rootNote, noteDuration, now + noteDurationSeconds + gapBetweenNotesInPair);
+                            await new Promise(r => setTimeout(r, 1e3 * (noteDurationSeconds * 2 + gapBetweenNotesInPair + delayBetweenPairs)));
+                            now = Tone.now();
+                            synth.triggerAttackRelease(intervalNote, noteDuration, now);
+                            synth.triggerAttackRelease(rootNoteOctaveUp, noteDuration, now + noteDurationSeconds + gapBetweenNotesInPair);
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 1e3 * (noteDurationSeconds * 2 + gapBetweenNotesInPair + 0.2)));
+                } catch (error) {
+                    console.error("Error in playInterval:", error);
+                } finally {
+                    isPlayingInterval = false;
+                }
+            };
+
+            const playCurrentPrompt = () => {
+                if (state.gameMode === 'tone_up') {
+                    if (state.targetFreq && synth) synth.triggerAttackRelease(state.targetFreq, "1n", Tone.now());
+                } else {
+                    if (!state.currentQuestion) return;
+                    playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, state.currentQuestion.direction, state.gameMode);
+                }
+            };
+
+            const handleAnswer = e => {
+                if (state.isAnswering) return;
+                state.isAnswering = true;
+                const { intervalId: correctIntervalId } = state.currentQuestion;
+                const correctResType = config.intervals[correctIntervalId].resolutionType;
+                const correctQual = config.intervals[correctIntervalId].qual;
+                const intervalName = config.intervals[correctIntervalId].name;
+                let isCorrect;
+
+                if (state.gameMode === 'all_intervals') {
+                    isCorrect = e.target.dataset.intervalId === correctIntervalId;
+                } else if (state.gameMode === 'resolution') {
+                    isCorrect = e.target.dataset.categoryId === correctResType;
+                } else if (state.gameMode === 'quality') {
+                    isCorrect = e.target.dataset.categoryId === correctQual;
+                }
+
+                state.stats[correctIntervalId].total++;
+                if (isCorrect) {
+                    state.score++;
+                    state.stats[correctIntervalId].correct++;
+                    e.target.classList.add('correct');
+                    dom.feedbackMessage.textContent = `Correct! It was a ${intervalName}.`;
+                    dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-green-500';
+
+                    const unansweredIndex = state.unansweredPool.indexOf(correctIntervalId);
+                    if (unansweredIndex > -1) state.unansweredPool.splice(unansweredIndex, 1);
+                    
+                } else {
+                    state.stats[correctIntervalId].incorrect++;
+                    e.target.classList.add('incorrect');
+
+                    if (!state.incorrectPool.includes(correctIntervalId)) {
+                        state.incorrectPool.push(correctIntervalId);
+                    }
+
+                    let correctButton, feedbackText;
+                    if (state.gameMode === 'all_intervals') {
+                        correctButton = dom.answerButtons.standard.querySelector(`[data-interval-id="${correctIntervalId}"]`);
+                        feedbackText = `Incorrect. It was a ${intervalName}.`;
+                    } else if (state.gameMode === 'resolution') {
+                        correctButton = dom.answerButtons.resolution.querySelector(`[data-category-id="${correctResType}"]`);
+                        feedbackText = `Incorrect. It was: ${config.resolutionCategories[correctResType]}. The interval was a ${intervalName}.`;
+                    } else {
+                        correctButton = dom.answerButtons.quality.querySelector(`[data-category-id="${correctQual}"]`);
+                        feedbackText = `Incorrect. It was: ${config.qualityCategories[correctQual]}. The interval was a ${intervalName}.`;
+                    }
+                    if (correctButton) correctButton.classList.add('correct');
+                    dom.feedbackMessage.textContent = feedbackText;
+                    dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-red-500';
+                }
+                updateUI();
+                dom.nextQuestionBtn.classList.remove('hidden');
+            };
+
+            const updateUI = () => {
+                const qNumDisplay = state.currentQuestionIndex;
+                dom.progressText.textContent = `Question ${qNumDisplay} / ${state.totalQuestions}`;
+                dom.scoreText.textContent = `Score: ${state.score}`;
+                dom.progressBar.style.width = `${(qNumDisplay / state.totalQuestions) * 100}%`;
+            };
+
+            const resetButtonStyles = () => {
+                let buttons;
+                if ("all_intervals" === state.gameMode) buttons = dom.answerButtons.standard.querySelectorAll(".btn-answer");
+                else if ("resolution" === state.gameMode) buttons = dom.answerButtons.resolution.querySelectorAll(".btn-answer");
+                else if ("quality" === state.gameMode) buttons = dom.answerButtons.quality.querySelectorAll(".btn-answer");
+                if (buttons) buttons.forEach((btn => {
+                    btn.classList.remove("correct", "incorrect")
+                }));
+                dom.feedbackMessage.textContent = " ";
+                dom.feedbackMessage.className = "mt-4 text-center font-semibold text-lg h-8"
+            };
+
             const showResults = () => {
                 const isToneUp = state.gameMode === 'tone_up';
                 dom.quizArea.classList.add("hidden");
                 dom.resultsArea.classList.remove("hidden");
                 dom.challengesHeader.style.display = isToneUp ? 'none' : 'block';
                 dom.challengesList.innerHTML = "";
-                const t = state.currentQuestionIndex, e = t, n = e > 0 ? (state.score / e * 100).toFixed(1) : 0;
-                dom.finalScore.textContent = `Your Score: ${state.score} / ${e} (${n}%)`;
+                const answeredQuestions = state.currentQuestionIndex > 0 ? state.currentQuestionIndex - 1 : 0;
+                const percentage = answeredQuestions > 0 ? (state.score / answeredQuestions * 100).toFixed(1) : 0;
+                dom.finalScore.textContent = `Your Score: ${state.score} / ${answeredQuestions} (${percentage}%)`;
                 if (!isToneUp) {
                     const o = Object.keys(state.stats).filter((t => state.stats[t].incorrect > 0)).sort(((t, e) => state.stats[e].incorrect - state.stats[t].incorrect || state.stats[e].total - state.stats[t].total));
-                    o.length > 0 ? o.forEach((t => { const { name: e } = config.intervals[t], { incorrect: n, total: o } = state.stats[t], s = document.createElement("li"); s.textContent = `${e}: Missed ${n} out of ${o} times.`, dom.challengesList.appendChild(s) })) : e > 0 ? dom.challengesList.innerHTML = "<li>You got everything right! Great job!</li>" : dom.challengesList.innerHTML = "<li>No questions were answered.</li>";
+                    o.length > 0 ? o.forEach((t => {
+                        const { name: e } = config.intervals[t], { incorrect: n, total: o } = state.stats[t], s = document.createElement("li");
+                        s.textContent = `${e}: Missed ${n} out of ${o} times.`, dom.challengesList.appendChild(s)
+                    })) : answeredQuestions > 0 ? dom.challengesList.innerHTML = "<li>You got everything right! Great job!</li>" : dom.challengesList.innerHTML = "<li>No questions were answered.</li>";
                 }
             };
-            const restartQuiz = () => { dom.resultsArea.classList.add('hidden'); dom.settingsPanel.classList.remove('hidden'); };
-            const playChord = async t => { if (isPlayingInterval) return; await createSynth(); const e = `${t}${state.octave}`, n = getNoteFromInterval(e.slice(0, -1), 4, state.octave), o = getNoteFromInterval(e.slice(0, -1), 7, state.octave), a = Tone.now(); synth instanceof Tone.PolySynth ? synth.triggerAttackRelease([e, n, o], "1n", a) : (synth.triggerAttackRelease(e, "8n", a), synth.triggerAttackRelease(n, "8n", a + .2), synth.triggerAttackRelease(o, "8n", a + .4)) };
-            
+
+            const restartQuiz = () => {
+                dom.resultsArea.classList.add('hidden');
+                dom.settingsPanel.classList.remove('hidden');
+            };
+
+            const playChord = t => {
+                return new Promise(resolve => {
+                    if (isPlayingInterval) return resolve();
+                    isPlayingInterval = true;
+                    const rootNote = `${t}${state.octave}`;
+                    const thirdNote = getNoteFromInterval(t, 4, state.octave);
+                    const fifthNote = getNoteFromInterval(t, 7, state.octave);
+                    const now = Tone.now();
+                    const chordDuration = "1n";
+                    if (dom.soundTypeSelect.value === 'synth') {
+                        polySynthVoices[0].triggerAttackRelease(rootNote, chordDuration, now);
+                        polySynthVoices[1].triggerAttackRelease(thirdNote, chordDuration, now);
+                        polySynthVoices[2].triggerAttackRelease(fifthNote, chordDuration, now);
+                    } else {
+                        synth.triggerAttackRelease(rootNote, chordDuration, now);
+                        synth.triggerAttackRelease(thirdNote, chordDuration, now + 0.1);
+                        synth.triggerAttackRelease(fifthNote, chordDuration, now + 0.2);
+                    }
+                    setTimeout(() => {
+                        isPlayingInterval = false;
+                        resolve();
+                    }, Tone.Time(chordDuration).toSeconds() * 1000 + 100);
+                });
+            };
+
             const onSliderInput = (e) => {
                 if (!state.sliderOscillator) return;
                 const isFamiliarize = e.target.id === 'familiarize-tone-slider';
                 const sliderElement = e.target;
                 const debugElement = isFamiliarize ? dom.familiarizeSliderDebugFreq : dom.sliderDebugFreq;
                 const targetFreq = isFamiliarize ? state.familiarizeTargetFreq : state.targetFreq;
-                
                 const currentFreq = parseFloat(sliderElement.value);
                 state.sliderOscillator.frequency.rampTo(currentFreq, 0.05);
                 if (debugElement) debugElement.textContent = `${currentFreq.toFixed(2)} Hz`;
-
                 if (isFamiliarize && targetFreq) {
                     const centsOff = 1200 * Math.log2(currentFreq / targetFreq);
                     const tolerance = parseInt(dom.centsToleranceInput.value, 10);
@@ -303,20 +660,24 @@
                     sliderElement.classList.toggle('dark:bg-green-700', isWithinTolerance);
                 }
             };
-            
-            const onSliderDown = (e) => {
+
+            const onSliderDown = async (e) => {
                 const isFamiliarize = e.target.id === 'familiarize-tone-slider';
                 if ((isFamiliarize && !state.familiarizeTargetFreq) || (!isFamiliarize && state.isAnswering)) return;
+                await initAudioAndSynth();
                 state.sliderOscillator = new Tone.Oscillator({ type: dom.soundTypeSelect.value === 'sine' ? 'sine' : 'triangle' }).toDestination().start();
                 document.addEventListener('mouseup', onSliderUp);
                 document.addEventListener('touchend', onSliderUp);
-                onSliderInput({target: e.target}); 
+                onSliderInput({ target: e.target });
             };
-            
+
             const onSliderUp = (e) => {
-                if (state.sliderOscillator) { state.sliderOscillator.stop().dispose(); state.sliderOscillator = null; }
+                if (state.sliderOscillator) {
+                    state.sliderOscillator.stop().dispose();
+                    state.sliderOscillator = null;
+                }
                 if (e.target.id === 'tone-slider') evaluateToneUpAnswer();
-                else { // Familiarize slider
+                else {
                     dom.familiarizeToneSlider.classList.remove('bg-green-300', 'dark:bg-green-700');
                 }
                 document.removeEventListener('mouseup', onSliderUp);
@@ -329,7 +690,6 @@
                 const targetFreq = state.targetFreq;
                 const centsOff = 1200 * Math.log2(selectedFreq / targetFreq);
                 const tolerance = parseInt(dom.centsToleranceInput.value, 10);
-                
                 if (Math.abs(centsOff) <= tolerance) {
                     state.score++;
                     dom.feedbackMessage.textContent = "Correct!";
@@ -339,33 +699,94 @@
                     dom.feedbackMessage.textContent = `Incorrect. You were ${Math.abs(centsOff).toFixed(1)} cents too ${direction}.`;
                     dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-red-500';
                 }
-                state.currentQuestionIndex++;
                 updateUI();
                 dom.nextQuestionBtn.classList.remove('hidden');
             };
 
-            const updateModeDescription = () => { dom.modeDescription.textContent = config.modeDescriptions[dom.modeSelector.querySelector('.active').dataset.mode]; updateFamiliarizeView(); };
+            const updateModeDescription = () => {
+                dom.modeDescription.textContent = config.modeDescriptions[dom.modeSelector.querySelector('.active').dataset.mode];
+                updateFamiliarizeView();
+            };
 
-            dom.modeSelector.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { dom.modeSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); updateModeDescription(); } });
-            dom.nextQuestionBtn.addEventListener('click', nextQuestion); dom.startBtn.addEventListener('click', startQuiz); dom.restartBtn.addEventListener('click', restartQuiz); dom.quitBtn.addEventListener('click', showResults);
-            dom.playChordBtnSettings.addEventListener('click', () => playChord(dom.keySelect.value)); dom.playChordBtnQuiz.addEventListener('click', () => { if(state.rootNote) playChord(state.rootNote) });
-            dom.replayContainerStandard.querySelectorAll('button').forEach(btn => btn.addEventListener('click', e => { if (state.isAnswering || !state.currentQuestion) return; playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, e.currentTarget.dataset.direction); }));
-            dom.replayBtnBeginner.addEventListener('click', () => { if (state.isAnswering || !state.currentQuestion) return; playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, 'desc'); });
-            dom.familiarizeIntervalContainer.addEventListener('click', async e => { if (e.target.matches('[data-interval-id]')) { await createSynth(); playInterval(dom.keySelect.value, e.target.dataset.intervalId, state.octave, e.target.dataset.direction); } });
-            dom.playTargetNoteBtn.addEventListener('click', playCurrentPrompt);
+            // --- Event Listeners ---
+            dom.modeSelector.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    dom.modeSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateModeDescription();
+                }
+            });
+
+            dom.nextQuestionBtn.addEventListener('click', nextQuestion);
+
+            dom.startBtn.addEventListener('click', async () => {
+                await initAudioAndSynth();
+                startQuiz();
+            });
+
+            dom.restartBtn.addEventListener('click', restartQuiz);
+
+            dom.quitBtn.addEventListener('click', showResults);
+
+            dom.playChordBtnSettings.addEventListener('click', async () => {
+                await initAudioAndSynth();
+                playChord(dom.keySelect.value);
+            });
+
+            dom.playChordBtnQuiz.addEventListener('click', async () => {
+                if (state.rootNote) {
+                    await initAudioAndSynth();
+                    playChord(state.rootNote);
+                }
+            });
+
+            dom.replayBtnQuizSingle.addEventListener('click', async () => {
+                if (state.isAnswering || !state.currentQuestion) return;
+                await initAudioAndSynth();
+                playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, state.currentQuestion.direction, state.gameMode);
+            });
+
+            dom.familiarizeIntervalContainer.addEventListener('click', async (e) => {
+                if (e.target.matches('[data-interval-id]')) {
+                    await initAudioAndSynth();
+                    const mode = dom.modeSelector.querySelector('.active').dataset.mode;
+                    const clickedDirection = e.target.dataset.direction;
+                    let playDirection = clickedDirection;
+                    if (mode === 'resolution') playDirection = 'both';
+                    playInterval(dom.keySelect.value, e.target.dataset.intervalId, state.octave, playDirection, mode);
+                }
+            });
+
+            dom.playTargetNoteBtn.addEventListener('click', async () => {
+                await initAudioAndSynth();
+                playCurrentPrompt();
+            });
+
             dom.toneSlider.addEventListener('input', onSliderInput);
             dom.toneSlider.addEventListener('mousedown', onSliderDown);
-            dom.toneSlider.addEventListener('touchstart', onSliderDown, {passive: true});
-            dom.familiarizePlayRandomNoteBtn.addEventListener('click', async () => { await createSynth(); const rootIndex = config.notes.indexOf(dom.keySelect.value); const scaleNoteIndex = config.majorScalePattern[Math.floor(Math.random() * config.majorScalePattern.length)]; const finalNoteIndex = (rootIndex + scaleNoteIndex) % 12; const targetNoteName = `${config.notes[finalNoteIndex]}${state.octave}`; state.familiarizeTargetFreq = Tone.Frequency(targetNoteName).toFrequency(); synth.triggerAttackRelease(state.familiarizeTargetFreq, "1n", Tone.now()); dom.familiarizeTargetFreqDebug.textContent = `Target: ${state.familiarizeTargetFreq.toFixed(2)} Hz` });
+            dom.toneSlider.addEventListener('touchstart', onSliderDown, { passive: true });
+
+            dom.familiarizePlayRandomNoteBtn.addEventListener('click', async () => {
+                await initAudioAndSynth();
+                const rootIndex = config.notes.indexOf(dom.keySelect.value);
+                const scaleNoteIndex = config.majorScalePattern[Math.floor(Math.random() * config.majorScalePattern.length)];
+                const finalNoteIndex = (rootIndex + scaleNoteIndex) % 12;
+                const targetNoteName = `${config.notes[finalNoteIndex]}${state.octave}`;
+                state.familiarizeTargetFreq = Tone.Frequency(targetNoteName).toFrequency();
+                synth.triggerAttackRelease(state.familiarizeTargetFreq, "1n", Tone.now());
+                dom.familiarizeTargetFreqDebug.textContent = `Target: ${state.familiarizeTargetFreq.toFixed(2)} Hz`
+            });
+
             dom.familiarizeToneSlider.addEventListener('input', onSliderInput);
             dom.familiarizeToneSlider.addEventListener('mousedown', onSliderDown);
-            dom.familiarizeToneSlider.addEventListener('touchstart', onSliderDown, {passive: true});
+            dom.familiarizeToneSlider.addEventListener('touchstart', onSliderDown, { passive: true });
+
             dom.freqToggle.addEventListener('change', (e) => {
                 const show = e.target.checked;
                 dom.targetFreqDebug.classList.toggle('hidden', !show);
                 dom.sliderDebugFreq.classList.toggle('hidden', !show);
             });
-            
+
             initializeUI();
             updateModeDescription();
         });
