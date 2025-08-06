@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Guessing Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for a smoother feel */
+        .card-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Ensure image doesn't exceed container height */
+        #sportImage {
+            max-height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+
+    <div class="w-full max-w-md mx-4 bg-white rounded-2xl shadow-lg p-6 sm:p-8 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">What Sport Is It?</h1>
+        <p class="text-gray-500 mb-6">Read the description and guess the sport!</p>
+
+        <!-- Card content that will be updated -->
+        <div id="game-card" class="min-h-[280px] mb-6 flex items-center justify-center">
+            <div class="card-content w-full">
+                <p id="description" class="text-lg text-gray-700"></p>
+                <div id="answer-container" class="hidden text-center">
+                    <img id="sportImage" src="" alt="Image of the sport" class="rounded-lg shadow-md mx-auto mb-4 w-full" onerror="this.onerror=null;this.src='https://placehold.co/400x200/ccc/FFFFFF?text=Image+Not+Found';">
+                    <p id="answer" class="text-2xl font-bold text-blue-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3 mb-6">
+            <!-- Reveal Answer Button -->
+            <button id="revealBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                Reveal Answer
+            </button>
+    
+            <!-- Translate Button -->
+            <button id="translateBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 2a8 8 0 015.466 13.597l-1.3-1.3A6 6 0 104.4 9.6l-1.59 1.59A8.002 8.002 0 0110 2zm4.534 11.403a6.003 6.003 0 00-8.131-8.131l1.3 1.3a4 4 0 015.53 5.53l1.3 1.3z" />
+                  <path d="M9.293 12.95l.707.707L12.414 11H18v-2h-5.586l-2.414-2.414-.707.707L11.086 9H5v2h6.086l-1.793 1.95z" />
+                </svg>
+                <span>Translate</span>
+            </button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center">
+            <button id="prevBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-5 rounded-lg transition-transform transform hover:scale-105">
+                &larr; Prev
+            </button>
+            <span id="counter" class="text-gray-500 text-sm font-medium">1 / 17</span>
+            <button id="nextBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-5 rounded-lg transition-transform transform hover:scale-105">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        // Array of sport objects with descriptions, names, and image URLs
+        const sports = [
+            { description: "You use a bow and a pointy stick to hit the tiny circle. Robin Hood was a big fan.", name: "Archery", imageUrl: "https://placehold.co/400x200/EBF4FF/1E40AF?text=Archery" },
+            { description: "It's a game of 'catch' where you also hit a ball with a big stick and run around a diamond.", name: "Baseball", imageUrl: "https://placehold.co/400x200/FEF2F2/B91C1C?text=Baseball" },
+            { description: "The goal is to throw a ball into a basket that has a hole in the bottom. It's much harder when very tall people try to stop you.", name: "Basketball", imageUrl: "https://placehold.co/400x200/FFF7ED/D97706?text=Basketball" },
+            { description: "Moving your body to music, either beautifully or like you're trying to get a spider off your clothes.", name: "Dance", imageUrl: "https://placehold.co/400x200/FDF2F8/BE185D?text=Dance" },
+            { description: "The art of falling into water gracefully from a great height. Hint: try not to flop.", name: "Diving", imageUrl: "https://placehold.co/400x200/EFF6FF/1D4ED8?text=Diving" },
+            { description: "People in helmets run into each other to fight over an egg-shaped ball. Sometimes they throw it, sometimes they hug it. Usually they fall down.", name: "Football", imageUrl: "https://placehold.co/400x200/F3E8FF/6B21A8?text=Football" },
+            { description: "You hit a tiny ball with a club, walk a long way to find it, and then hit it again. Some people call it a great way to ruin a perfectly good walk.", name: "Golf", imageUrl: "https://placehold.co/400x200/ECFDF5/059669?text=Golf" },
+            { description: "Flipping, tumbling, and bending in ways that would send most people to the hospital. Spandex is required.", name: "Gymnastics", imageUrl: "https://placehold.co/400x200/FEE2E2/DC2626?text=Gymnastics" },
+            { description: "Skating on ice while trying to hit a small rubber disk into a net with a stick. Sometimes there are disagreements.", name: "Hockey", imageUrl: "https://placehold.co/400x200/E0F2FE/0891B2?text=Hockey" },
+            { description: "The art of 'hi-ya!' You learn to break boards with your hands and feet, which is very useful for... well, for breaking boards.", name: "Karate", imageUrl: "https://placehold.co/400x200/1F2937/F9FAFB?text=Karate" },
+            { description: "Putting one foot in front of the other, but faster. People do this for fun, or when they're being chased.", name: "Running", imageUrl: "https://placehold.co/400x200/F5F3FF/6D28D9?text=Running" },
+            { description: "Trying to look cool while balancing on shoes with wheels or blades. The ground is your worst enemy.", name: "Skating", imageUrl: "https://placehold.co/400x200/F0F9FF/0EA5E9?text=Skating" },
+            { description: "You kick a ball around a field for 90 minutes, but you're not allowed to use your hands. It's why everyone except American calls it 'football'.", name: "Soccer", imageUrl: "https://placehold.co/400x200/F7FEE7/65A30D?text=Soccer" },
+            { description: "Standing on a board while a giant wave tries to knock you over. It's like a rollercoaster, but the track is trying to drown you.", name: "Surfing", imageUrl: "https://placehold.co/400x200/E0F2FE/0284C7?text=Surfing" },
+            { description: "Moving through water without sinking. A very important skill, especially if you find yourself on a boat that is sinking.", name: "Swimming", imageUrl: "https://placehold.co/400x200/DBEAFE/3B82F6?text=Swimming" },
+            { description: "You hit a fuzzy yellow ball over a net with a racket. It involves a lot of grunting and running back and forth.", name: "Tennis", imageUrl: "https://placehold.co/400x200/F3FEE7/84CC16?text=Tennis" },
+            { description: "A game where you and your friends try to keep a ball from touching the ground on your side of a tall net. Often seen on the beach.", name: "Volleyball", imageUrl: "https://placehold.co/400x200/FEF9C3/F59E0B?text=Volleyball" }
+        ];
+
+        // --- STATE ---
+        let currentIndex = 0;
+
+        // --- DOM ELEMENTS ---
+        const descriptionEl = document.getElementById('description');
+        const answerContainerEl = document.getElementById('answer-container');
+        const answerEl = document.getElementById('answer');
+        const sportImageEl = document.getElementById('sportImage');
+        const revealBtn = document.getElementById('revealBtn');
+        const translateBtn = document.getElementById('translateBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counterEl = document.getElementById('counter');
+        const gameCardEl = document.getElementById('game-card');
+
+        // --- FUNCTIONS ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array - The array to be shuffled.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // ES6 destructuring swap
+            }
+        }
+
+        /**
+         * Loads a sport's data into the UI based on the provided index.
+         * @param {number} index - The index of the sport in the shuffled sports array.
+         */
+        function loadSport(index) {
+            gameCardEl.style.opacity = 0;
+            setTimeout(() => {
+                const sport = sports[index];
+                descriptionEl.textContent = sport.description;
+                answerEl.textContent = sport.name;
+                sportImageEl.src = sport.imageUrl;
+                sportImageEl.alt = `Image of ${sport.name}`;
+
+                // Reset the view
+                answerContainerEl.classList.add('hidden');
+                descriptionEl.classList.remove('hidden');
+                revealBtn.disabled = false;
+                revealBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                counterEl.textContent = `${index + 1} / ${sports.length}`;
+                gameCardEl.style.opacity = 1;
+            }, 200);
+        }
+
+        // --- EVENT LISTENERS ---
+
+        revealBtn.addEventListener('click', () => {
+            descriptionEl.classList.add('hidden');
+            answerContainerEl.classList.remove('hidden');
+            revealBtn.disabled = true;
+            revealBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+
+        translateBtn.addEventListener('click', () => {
+            const currentDescription = sports[currentIndex].description;
+            const encodedDescription = encodeURIComponent(currentDescription);
+            const translateUrl = `https://translate.google.com/?sl=en&text=${encodedDescription}`;
+            window.open(translateUrl, '_blank');
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % sports.length;
+            loadSport(currentIndex);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + sports.length) % sports.length;
+            loadSport(currentIndex);
+        });
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            shuffleArray(sports); // Randomize the order of questions
+            loadSport(currentIndex); // Load the first (random) sport
+        });
+    </script>
+</body>
+</html>
