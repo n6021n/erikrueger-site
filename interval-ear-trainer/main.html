@@ -65,14 +65,14 @@
             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold mb-4 text-center">Game Mode</h3>
                 <div id="mode-selector" class="mode-btn-group w-full flex rounded-lg bg-gray-200 dark:bg-gray-700 p-1">
-                    <button data-mode="quality" class="active flex-1 text-sm font-semibold p-2 rounded-md transition">Quality</button>
+                    <button data-mode="tone_up" class="active flex-1 text-sm font-semibold p-2 rounded-md transition">Tone Up!</button>
+                    <button data-mode="quality" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Quality</button>
                     <button data-mode="resolution" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Resolution</button>
                     <button data-mode="all_intervals" class="flex-1 text-sm font-semibold p-2 rounded-md transition">All Intervals</button>
-                    <button data-mode="tone_up" class="flex-1 text-sm font-semibold p-2 rounded-md transition">Tone Up!</button>
                 </div>
                 <p id="mode-description" class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3 min-h-[20px] px-2"></p>
             </div>
-            <div id="familiarize-section" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div id="familiarize-section" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700" style="min-height: 360px;">
                 <h3 class="text-lg font-semibold mb-3 text-center">Familiarize Yourself</h3>
                 <div id="familiarize-legend" class="mb-4 flex justify-center items-center gap-x-4 gap-y-2 flex-wrap text-xs"></div>
                 <div id="familiarize-interval-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
@@ -102,7 +102,7 @@
                     <label id="freq-toggle-label" for="freq-toggle" class="hidden items-center cursor-pointer text-xs">
                         <span class="mr-2">Show Hz</span>
                         <div class="relative">
-                            <input type="checkbox" id="freq-toggle" class="sr-only" checked>
+                            <input type="checkbox" id="freq-toggle" class="sr-only">
                             <div class="toggle-bg block bg-gray-400 dark:bg-gray-600 w-10 h-6 rounded-full"></div>
                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
                         </div>
@@ -120,7 +120,7 @@
             <div id="tone-up-quiz-controls" class="hidden mb-6 text-center">
                  <div class="flex justify-center items-center gap-4 mb-8">
                     <button id="play-target-note-btn" class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow">Play Target Note</button>
-                    <span id="target-freq-debug" class="text-xs font-mono"></span>
+                    <span id="target-freq-debug" class="text-xs font-mono hidden"></span>
                  </div>
                  <div id="slider-container" class="relative w-full sm:w-3/4 mx-auto flex items-center gap-4">
                     <input type="range" min="200" max="600" value="400" id="tone-slider" class="tone-slider-input flex-grow">
@@ -129,7 +129,7 @@
             </div>
 
             <div id="answer-buttons-standard" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
-            <div id="answer-buttons-resolution" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            <div id="answer-buttons-resolution" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
             <div id="answer-buttons-quality" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
             <div id="feedback-message" class="mt-4 text-center font-semibold text-lg h-8">&nbsp;</div>
             <button id="next-question-btn" class="hidden mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow">Next Question</button>
@@ -196,22 +196,22 @@
 
             const config = {
                 intervals: {
-                    'm2': { name: 'Minor 2nd', semitones: 1, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'downward_resolution' },
+                    'm2': { name: 'Minor 2nd', semitones: 1, inScale: true, res: 'resolving', qual: 'minor', resolutionType: null },
                     'M2': { name: 'Major 2nd', semitones: 2, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'downward_resolution' },
-                    'm3': { name: 'Minor 3rd', semitones: 3, inScale: true, res: 'stable', qual: 'minor', resolutionType: 'downward_resolution' },
-                    'M3': { name: 'Major 3rd', semitones: 4, inScale: true, res: 'stable', qual: 'major', resolutionType: 'downward_resolution' },
+                    'm3': { name: 'Minor 3rd', semitones: 3, inScale: true, res: 'stable', qual: 'minor', resolutionType: null },
+                    'M3': { name: 'Major 3rd', semitones: 4, inScale: true, res: 'stable', qual: 'major', resolutionType: 'stable' },
                     'P4': { name: 'Perfect 4th', semitones: 5, inScale: true, res: 'resolving', qual: 'perfect', resolutionType: 'downward_resolution' },
                     'TT': { name: 'Tritone', semitones: 6, inScale: false, res: null, qual: null, resolutionType: null },
-                    'P5': { name: 'Perfect 5th', semitones: 7, inScale: true, res: 'stable', qual: 'perfect', resolutionType: 'upward_resolution' },
-                    'm6': { name: 'Minor 6th', semitones: 8, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'upward_resolution' },
+                    'P5': { name: 'Perfect 5th', semitones: 7, inScale: true, res: 'stable', qual: 'perfect', resolutionType: 'stable' },
+                    'm6': { name: 'Minor 6th', semitones: 8, inScale: true, res: 'resolving', qual: 'minor', resolutionType: null },
                     'M6': { name: 'Major 6th', semitones: 9, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'upward_resolution' },
-                    'm7': { name: 'Minor 7th', semitones: 10, inScale: true, res: 'resolving', qual: 'minor', resolutionType: 'upward_resolution' },
+                    'm7': { name: 'Minor 7th', semitones: 10, inScale: true, res: 'resolving', qual: 'minor', resolutionType: null },
                     'M7': { name: 'Major 7th', semitones: 11, inScale: true, res: 'resolving', qual: 'major', resolutionType: 'upward_resolution' },
-                    'P8': { name: 'Octave', semitones: 12, inScale: true, res: 'stable', qual: 'perfect', resolutionType: 'upward_resolution' }
+                    'P8': { name: 'Octave', semitones: 12, inScale: true, res: 'stable', qual: 'perfect', resolutionType: null }
                 },
                 notes: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
                 majorScalePattern: [0, 2, 4, 5, 7, 9, 11],
-                resolutionCategories: { 'downward_resolution': 'Resolves Downward', 'upward_resolution': 'Resolves Upward' },
+                resolutionCategories: { 'downward_resolution': 'Resolves Downward', 'upward_resolution': 'Resolves Upward', 'stable': 'Stable' },
                 qualityCategories: { 'major': 'Major', 'minor': 'Minor', 'perfect': 'Perfect' },
                 modeDescriptions: {
                     all_intervals: 'Identify specific major, minor, and perfect intervals.',
@@ -295,6 +295,12 @@
                 resolutionBtn2.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
                 resolutionBtn2.addEventListener('click', handleAnswer);
                 dom.answerButtons.resolution.appendChild(resolutionBtn2);
+                const resolutionBtn3 = document.createElement('button');
+                resolutionBtn3.dataset.categoryId = 'stable';
+                resolutionBtn3.textContent = 'Stable';
+                resolutionBtn3.className = 'btn-answer w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium py-3 px-2 rounded-lg';
+                resolutionBtn3.addEventListener('click', handleAnswer);
+                dom.answerButtons.resolution.appendChild(resolutionBtn3);
                 Object.keys(config.qualityCategories).forEach(key => {
                     const btn = document.createElement('button');
                     btn.dataset.categoryId = key;
@@ -316,7 +322,7 @@
                 let intervalsToShow = Object.keys(config.intervals);
                 if (mode === 'resolution') {
                     intervalsToShow = intervalsToShow.filter(id => config.intervals[id].resolutionType);
-                    dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Resolves Downward</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-200 dark:bg-red-700 mr-1.5"></span>Resolves Upward</div>`;
+                    dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Resolves Downward</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-200 dark:bg-red-700 mr-1.5"></span>Resolves Upward</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-200 dark:bg-blue-700 mr-1.5"></span>Stable</div>`;
                 } else if (mode === 'quality') {
                     intervalsToShow = intervalsToShow.filter(id => id !== 'TT');
                     dom.familiariseLegend.innerHTML = `<div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-200 dark:bg-yellow-700 mr-1.5"></span>Major</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-200 dark:bg-blue-700 mr-1.5"></span>Minor</div><div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-200 dark:bg-green-700 mr-1.5"></span>Perfect</div>`;
@@ -327,6 +333,7 @@
                     if (mode === 'resolution') {
                         if (data.resolutionType === 'downward_resolution') colorClass = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
                         else if (data.resolutionType === 'upward_resolution') colorClass = 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+                        else if (data.resolutionType === 'stable') colorClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
                     } else if (mode === 'quality') {
                         if (data.qual === 'major') colorClass = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
                         else if (data.qual === 'minor') colorClass = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
@@ -514,7 +521,7 @@
 
             const playCurrentPrompt = () => {
                 if (state.gameMode === 'tone_up') {
-                    if (state.targetFreq && synth) synth.triggerAttackRelease(state.targetFreq, "1n", Tone.now());
+                    if (state.targetFreq && synth) synth.triggerAttackRelease(state.targetFreq, "2n", Tone.now());
                 } else {
                     if (!state.currentQuestion) return;
                     playInterval(state.rootNote, state.currentQuestion.intervalId, state.octave, state.currentQuestion.direction, state.gameMode);
@@ -690,12 +697,12 @@
                 const targetFreq = state.targetFreq;
                 const centsOff = 1200 * Math.log2(selectedFreq / targetFreq);
                 const tolerance = parseInt(dom.centsToleranceInput.value, 10);
+                const direction = centsOff > 0 ? "high" : "low";
                 if (Math.abs(centsOff) <= tolerance) {
                     state.score++;
-                    dom.feedbackMessage.textContent = "Correct!";
+                    dom.feedbackMessage.textContent = `Correct! ${Math.abs(centsOff).toFixed(1)} cents ${direction}.`;
                     dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-green-500';
                 } else {
-                    const direction = centsOff > 0 ? "high" : "low";
                     dom.feedbackMessage.textContent = `Incorrect. You were ${Math.abs(centsOff).toFixed(1)} cents too ${direction}.`;
                     dom.feedbackMessage.className = 'mt-4 text-center font-semibold text-lg h-8 text-red-500';
                 }
